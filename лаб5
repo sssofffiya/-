@@ -1,0 +1,140 @@
+CalcException.java
+public class CalcException extends ArithmeticException {
+   public CalcException() {}
+   public CalcException(String cause) {
+       super(cause);
+   }
+}
+
+
+
+CalcWFio.java
+public class CalcWFio {
+   private double result;
+
+   public void setResult(double r) { result = r; }
+   public double getResult() { return result; }
+
+   /**
+    * Запис результату у текстовий файл (один double, формат %f).
+    * @param fName ім'я файлу
+    * @throws FileNotFoundException якщо файл не може бути створено
+    */
+   public void writeResTxt(String fName) throws FileNotFoundException {
+       PrintWriter f = new PrintWriter(fName);
+       //f.printf("%f%n", result);
+       f.print(Double.toString(result));
+       f.close();
+   }
+
+   /**
+    * Зчитування результату з текстового файлу.
+    * @param fName ім'я файлу
+    * @throws FileNotFoundException якщо файл не знайдено
+    */
+   public void readResTxt(String fName) throws FileNotFoundException {
+       File f = new File(fName);
+       if (!f.exists()) throw new FileNotFoundException("File " + fName + " not found");
+       Scanner s = new Scanner(f);
+       if (s.hasNextDouble()) {
+           result = s.nextDouble();
+       } else {
+           throw new IllegalStateException("File does not contain a double value");
+       }
+       s.close();
+   }
+
+   /**
+    * Запис результату у бінарний файл (DataOutputStream).
+    * @param fName ім'я файлу
+    * @throws IOException при помилках вводу/виводу
+    */
+   public void writeResBin(String fName) throws IOException {
+       try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(fName))) {
+           dos.writeDouble(result);
+       }
+   }
+
+   /**
+    * Зчитування результату з бінарного файлу (DataInputStream).
+    * @param fName ім'я файлу
+    * @throws IOException при помилках вводу/виводу
+    */
+   public void readResBin(String fName) throws IOException {
+       try (DataInputStream dis = new DataInputStream(new FileInputStream(fName))) {
+           result = dis.readDouble();
+       }
+   }
+}
+
+
+
+
+Equations.java
+public class Equations {
+   /**
+    * Обчислює y = sin(x)/cos(x).
+    * @param x кут у градусах
+    * @return результат
+    * @throws CalcException коли cos(x) == 0 (ділення на нуль)
+    */
+   public double calculate(double x) throws CalcException {
+       double rad = Math.toRadians(x);
+       double cos = Math.cos(rad);
+       if (Math.abs(cos) < 1e-12) { // захист від ділення на нуль
+           throw new CalcException("Exception reason: cos(x) = 0, ділення на нуль неможливе");
+       }
+       double y = Math.sin(rad) / cos;
+       if (Double.isNaN(y) || Double.isInfinite(y)) {
+           throw new CalcException("Result is NaN or Infinite");
+       }
+       return y;
+   }
+}
+
+
+
+
+Lab5App.java
+public class Lab5App {
+   public static void main(String[] args) {
+       Scanner in = new Scanner(System.in);
+       Equations eq = new Equations();
+       CalcWFio fio = new CalcWFio();
+
+       try {
+           System.out.print("Введіть X (у градусах): ");
+           double x = in.nextDouble();
+           double result = eq.calculate(x);
+           fio.setResult(result);
+           System.out.println("Результат обчислення: y = " + result);
+
+           String txtFile = "result.txt";
+           String binFile = "result.bin";
+
+           // запис
+           fio.writeResTxt(txtFile);
+           fio.writeResBin(binFile);
+           System.out.println("Результат записано у файли: " + txtFile + ", " + binFile);
+
+           // зчитування назад (демонстрація)
+           CalcWFio fio2 = new CalcWFio();
+           fio2.readResTxt(txtFile);
+           System.out.println("Зчитано з текстового файлу: y = " + fio2.getResult());
+
+           fio2.readResBin(binFile);
+           System.out.println("Зчитано з бінарного файлу: y = " + fio2.getResult());
+
+       } catch (CalcException ex) {
+           System.out.println("CalcException: " + ex.getMessage());
+       } catch (FileNotFoundException ex) {
+           System.out.println("FileNotFoundException: " + ex.getMessage());
+       } catch (IOException ex) {
+           System.out.println("IOException: " + ex.getMessage());
+       } catch (Exception ex) {
+           System.out.println("Unexpected exception: " + ex.getMessage());
+       } finally {
+           in.close();
+       }
+   }
+}
