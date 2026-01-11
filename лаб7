@@ -1,0 +1,40 @@
+"""
+Lab 7 module: builds a square matrix
+with an inverted isosceles triangle
+in the upper part of the square.
+
+Author: Vapenska S. V.
+Group: KI-303
+"""
+
+# User enters matrix size
+matrix_size = int(input("Enter matrix size: "))
+
+# User enters fill symbol
+symbol = input("Enter fill symbol: ")
+
+# Check if exactly one symbol is entered
+if len(symbol) != 1:
+    print("Enter exactly one symbol")
+    exit()
+
+# Build matrix as text
+text = ""
+
+for i in range(0, matrix_size):
+    for j in range(0, matrix_size):
+        # Condition for inverted upper triangle
+        if i <= matrix_size // 2 and j >= i and j < matrix_size - i:
+            s = symbol
+        else:
+            s = "0"
+        text += f"{s}  "
+
+    # Stop after the center of the square
+    if i + 1 == (matrix_size + 1) // 2:
+        break
+
+    text += "\n"
+
+# Output matrix
+print(text)
