@@ -1,0 +1,60 @@
+package lab1;
+
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+
+/**
+ * Лабораторна робота №1
+ * Побудова перевернутого рівнобедреного трикутника
+ * у верхній частині квадратної матриці.
+ *
+ * @author Вапенська
+ * @group КІ-303
+ */
+public class Lab1VapenskaKI_303 {
+
+    /**
+     * Точка входу в програму
+     *
+     * @param args аргументи командного рядка
+     */
+    public static void main(String[] args) {
+
+        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        Scanner in = new Scanner(System.in);
+
+        out.print("Введіть розмір квадрату (непарне число): ");
+        int n = in.nextInt();
+        in.nextLine();
+
+        out.print("Введіть символ-заповнювач: ");
+        String filler = in.nextLine();
+
+        if (filler.length() != 1) {
+            out.println("Помилка: введіть ОДИН символ.");
+            return;
+        }
+
+        char ch = filler.charAt(0);
+
+        int rows = n / 2 + 1;
+
+        for (int i = 0; i < rows; i++) {
+
+            // ліві відступи
+            for (int s = 0; s < i; s++) {
+                out.print("\t");
+            }
+
+            // символи трикутника
+            for (int j = 0; j < n - 2 * i; j++) {
+                out.print(ch + "\t");
+            }
+
+            out.println();
+        }
+
+        in.close();
+    }
+}
