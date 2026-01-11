@@ -1,0 +1,151 @@
+bark_module.py
+# Module responsible for dog barking
+
+class BarkModule:
+    def __init__(self, volume=5):
+        self.__volume = volume  # from 1 to 10
+
+    def bark(self, log):
+        message = "Woof-woof! " + "!" * self.__volume
+        print(message)
+        log.write(message + "\n")
+
+dog_brain.py
+# Module that represents the dog's brain
+
+class DogBrain:
+    def __init__(self, iq=50):
+        self.__iq = iq
+
+    def think(self, log):
+        message = "The dog is thinking..."
+        print(message)
+        log.write(message + "\n")
+
+    def increase_iq(self, value, log):
+        self.__iq += value
+        message = f"Dog IQ increased to {self.__iq}"
+        print(message)
+        log.write(message + "\n")
+
+    def get_iq(self):
+        return self.__iq
+
+dog_position.py
+# Module that represents dog's position in space
+
+class DogPosition:
+    def __init__(self, x=0, y=0):
+        self.__x = x
+        self.__y = y
+
+    def move(self, dx, dy, log):
+        self.__x += dx
+        self.__y += dy
+        message = f"Dog moved to position ({self.__x}, {self.__y})"
+        print(message)
+        log.write(message + "\n")
+
+dog.py 
+# Base class Dog
+
+from bark_module import BarkModule
+from dog_brain import DogBrain
+from dog_position import DogPosition
+
+
+class Dog:
+    def __init__(self, name, breed, age, log):
+        self._name = name
+        self._breed = breed
+        self._age = age
+        self._log = log
+
+        self._bark_module = BarkModule()
+        self.brain = DogBrain()
+        self._position = DogPosition()
+
+        message = f"Dog created: {name}, breed: {breed}, age: {age}"
+        print(message)
+        log.write(message + "\n")
+
+    def bark(self):
+        self._bark_module.bark(self._log)
+
+    def move(self, dx, dy):
+        self._position.move(dx, dy, self._log)
+
+    def think(self):
+        self.brain.think(self._log)
+
+    def increase_iq(self, value):
+        self.brain.increase_iq(value, self._log)
+
+    def get_name(self):
+        return self._name
+
+experimental_dog.py (derived class)
+# Derived class ExperimentalDog
+
+from dog import Dog
+
+
+class ExperimentalDog:
+    def __init__(self, name, breed, age, experiment_type, log):
+        super().__init__(name, breed, age, log)
+        self._experiment_type = experiment_type
+        self._result = None
+
+        message = f"Experiment assigned: {experiment_type}"
+        print(message)
+        log.write(message + "\n")
+
+    def start_experiment(self, success=True):
+        if success:
+            self._result = "SUCCESS"
+            message = f"Experiment '{self._experiment_type}' completed successfully."
+        else:
+            self._result = "FAILED"
+            message = f"Experiment '{self._experiment_type}' failed."
+
+        print(message)
+        self._log.write(message + "\n")
+
+    def report(self):
+        message = f"Experiment report: {self._experiment_type} — {self._result}"
+        print(message)
+        self._log.write(message + "\n")
+
+main.py
+# -*- coding: utf-8 -*-
+"""
+Laboratory work No.9
+Base class: Dog
+Derived class: ExperimentalDog
+Author: Vapenska S. V.
+"""
+
+from experimental_dog import ExperimentalDog
+
+if __name__ == "__main__":
+    with open("dog_log.txt", "a", encoding="utf-8") as log:
+
+        luntik = ExperimentalDog(
+            name="Luntik",
+            breed="Yorkshire Terrier",
+            age=9,
+            experiment_type="Eating a bone",
+            log=log
+        )
+
+        luntik.bark()
+        luntik.move(2, 3)
+        luntik.think()
+
+        # failed experiment example
+        luntik.start_experiment(success=False)
+        luntik.report()
+
+        luntik.increase_iq(10)
+
+        log.write("Program finished.\n\n")
